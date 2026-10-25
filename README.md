@@ -3,24 +3,41 @@
 Running this image starts **Quake 3 Arena** server with OSP and instagib on. Using full **OSP 1.03a**.
 
 ### Requirements
-This image is fully functional, you only need to supply your own `pak0.pk3` file. If you own the game on Steam, it lives in `steamapps/common/Quake 3 Arena/baseq3/pak0.pk3`. If yours lives elsewhere (e.g. a CD install), adjust the mount path below.
+This image is fully functional, you only need to supply your own `pak0.pk3` file. If you own the game on Steam, it lives in `steamapps/common/Quake 3 Arena/baseq3/pak0.pk3` (Windows: `C:\Program Files (x86)\Steam\steamapps\common\Quake 3 Arena\baseq3\pak0.pk3`); a CD install keeps it in `quake3/baseq3/`. Point the mount below at wherever yours is.
 
-The canonical image lives in this repo's Forgejo container registry; the same image is mirrored to Docker Hub as `wokoman/quake3-osp-server`.
+The canonical image lives in this repo's Forgejo container registry; the same image is mirrored to Docker Hub as `wokoman/quake3-osp-server` (public, pulls without a login).
+
+### Quickstart
+For when you know what you're doing — any OS, `docker` or `podman` (swap the command name). Pull the image:
+
+```shell
+docker pull git.michalkozak.cz/wokoman/quake3-osp-server
+```
+
+No Forgejo login? The Docker Hub mirror pulls anonymously: `docker pull wokoman/quake3-osp-server`.
+
+Run the server, pointing the mount at your `pak0.pk3`:
 
 ```shell
 docker run --name q3aospserver -d --restart=always -p 27960:27960/udp \
--v "$HOME/.local/share/Steam/steamapps/common/Quake 3 Arena/baseq3/pak0.pk3:/usr/share/games/quake3/baseq3/pak0.pk3:ro,Z" \
+-v "$HOME/.local/share/Steam/steamapps/common/Quake 3 Arena/baseq3/pak0.pk3:/usr/share/games/quake3/baseq3/pak0.pk3:ro" \
 git.michalkozak.cz/wokoman/quake3-osp-server
 ```
 
-`--restart=always` brings the server back on every boot. For rootless podman, enable that once with `systemctl --user enable --now podman-restart.service`; to serve before anyone logs in, also run `loginctl enable-linger`.
+Play: players join from the Q3 console with `connect <your LAN IP>`.
+
+On SELinux hosts (Fedora/RHEL family) use `:ro,Z` instead of `:ro`, otherwise the engine cannot read `pak0.pk3`.
+
+`--restart=always` brings the server back on every boot; make the engine itself autostart too — Docker Desktop: *Start Docker Desktop when you sign in*; rootless podman: `systemctl --user enable --now podman-restart.service`, plus `loginctl enable-linger` if it should serve before anyone logs in. If players can't see the server, allow inbound UDP 27960 in your host firewall.
+
+Prefer this walked step by step? `./scripts/host-wizard.sh` runs the same flow interactively, probing your OS for the `pak0.pk3` path, firewall and autostart specifics.
 
 ### Customization
 To run one of OSP's own mode configs instead of the default instagib, append `+exec`, e.g. freezetag:
 
 ```shell
 docker run --name q3aospserver -d --restart=always -p 27960:27960/udp \
--v "$HOME/.local/share/Steam/steamapps/common/Quake 3 Arena/baseq3/pak0.pk3:/usr/share/games/quake3/baseq3/pak0.pk3:ro,Z" \
+-v "$HOME/.local/share/Steam/steamapps/common/Quake 3 Arena/baseq3/pak0.pk3:/usr/share/games/quake3/baseq3/pak0.pk3:ro" \
 git.michalkozak.cz/wokoman/quake3-osp-server +exec freezetag.cfg
 ```
 
@@ -30,7 +47,7 @@ Or bring your own server config — mount it and exec it:
 
 ```shell
 docker run --name q3aospserver -d --restart=always -p 27960:27960/udp \
--v "$HOME/.local/share/Steam/steamapps/common/Quake 3 Arena/baseq3/pak0.pk3:/usr/share/games/quake3/baseq3/pak0.pk3:ro,Z" \
+-v "$HOME/.local/share/Steam/steamapps/common/Quake 3 Arena/baseq3/pak0.pk3:/usr/share/games/quake3/baseq3/pak0.pk3:ro" \
 -v /path/to/server.cfg:/usr/share/games/quake3/osp/server.cfg \
 git.michalkozak.cz/wokoman/quake3-osp-server +exec server.cfg
 ```
@@ -68,7 +85,7 @@ Before releasing, run the smoke test — it builds the image, boots it against a
 ./smoke_test.py
 ```
 
-Note for podman users: podman's default OCI image build drops `HEALTHCHECK` metadata; build with `--format docker` to keep it. Images built and released with docker carry it. The `:Z` on the bind mount relabels `pak0.pk3` for SELinux hosts (e.g. Fedora); without it the engine cannot read the file.
+Note for podman users: podman's default OCI image build drops `HEALTHCHECK` metadata; build with `--format docker` to keep it. Images built and released with docker carry it.
 
 ### Troubleshooting
 The server logs, so you can simply:

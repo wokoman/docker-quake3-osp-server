@@ -8,17 +8,19 @@ This image is fully functional, you only need to supply your own `pak0.pk3` file
 The canonical image lives in this repo's Forgejo container registry; the same image is mirrored to Docker Hub as `wokoman/quake3-osp-server`.
 
 ```shell
-docker run --name q3aospserver -d -p 27960:27960/udp \
--v "$HOME/.local/share/Steam/steamapps/common/Quake 3 Arena/baseq3/pak0.pk3:/usr/share/games/quake3/baseq3/pak0.pk3" \
+docker run --name q3aospserver -d --restart=always -p 27960:27960/udp \
+-v "$HOME/.local/share/Steam/steamapps/common/Quake 3 Arena/baseq3/pak0.pk3:/usr/share/games/quake3/baseq3/pak0.pk3:ro,Z" \
 git.michalkozak.cz/wokoman/quake3-osp-server
 ```
+
+`--restart=always` brings the server back on every boot. For rootless podman, enable that once with `systemctl --user enable --now podman-restart.service`; to serve before anyone logs in, also run `loginctl enable-linger`.
 
 ### Customization
 To run one of OSP's own mode configs instead of the default instagib, append `+exec`, e.g. freezetag:
 
 ```shell
-docker run --name q3aospserver -d -p 27960:27960/udp \
--v "$HOME/.local/share/Steam/steamapps/common/Quake 3 Arena/baseq3/pak0.pk3:/usr/share/games/quake3/baseq3/pak0.pk3" \
+docker run --name q3aospserver -d --restart=always -p 27960:27960/udp \
+-v "$HOME/.local/share/Steam/steamapps/common/Quake 3 Arena/baseq3/pak0.pk3:/usr/share/games/quake3/baseq3/pak0.pk3:ro,Z" \
 git.michalkozak.cz/wokoman/quake3-osp-server +exec freezetag.cfg
 ```
 
@@ -27,8 +29,8 @@ Other included modes: `ffa.cfg`, `ctf.cfg`, `1v1.cfg`, `team.cfg`, `clanarena.cf
 Or bring your own server config — mount it and exec it:
 
 ```shell
-docker run --name q3aospserver -d -p 27960:27960/udp \
--v "$HOME/.local/share/Steam/steamapps/common/Quake 3 Arena/baseq3/pak0.pk3:/usr/share/games/quake3/baseq3/pak0.pk3" \
+docker run --name q3aospserver -d --restart=always -p 27960:27960/udp \
+-v "$HOME/.local/share/Steam/steamapps/common/Quake 3 Arena/baseq3/pak0.pk3:/usr/share/games/quake3/baseq3/pak0.pk3:ro,Z" \
 -v /path/to/server.cfg:/usr/share/games/quake3/osp/server.cfg \
 git.michalkozak.cz/wokoman/quake3-osp-server +exec server.cfg
 ```
@@ -66,7 +68,7 @@ Before releasing, run the smoke test — it builds the image, boots it against a
 ./smoke_test.py
 ```
 
-Note for podman users: podman's default OCI image build drops `HEALTHCHECK` metadata; build with `--format docker` to keep it. Images built and released with docker carry it. On SELinux hosts (e.g. Fedora), append `:Z` to the bind mounts — otherwise the engine cannot read `pak0.pk3`.
+Note for podman users: podman's default OCI image build drops `HEALTHCHECK` metadata; build with `--format docker` to keep it. Images built and released with docker carry it. The `:Z` on the bind mount relabels `pak0.pk3` for SELinux hosts (e.g. Fedora); without it the engine cannot read the file.
 
 ### Troubleshooting
 The server logs, so you can simply:

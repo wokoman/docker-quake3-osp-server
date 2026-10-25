@@ -5,10 +5,12 @@ Running this image starts **Quake 3 Arena** server with OSP and instagib on. Usi
 ### Requirements
 This image is fully functional, you only need to supply your own `pak0.pk3` file. If you own the game on Steam, it lives in `steamapps/common/Quake 3 Arena/baseq3/pak0.pk3`. If yours lives elsewhere (e.g. a CD install), adjust the mount path below.
 
+The canonical image lives in this repo's Forgejo container registry; the same image is mirrored to Docker Hub as `wokoman/quake3-osp-server`.
+
 ```shell
 docker run --name q3aospserver -d -p 27960:27960/udp \
 -v "$HOME/.local/share/Steam/steamapps/common/Quake 3 Arena/baseq3/pak0.pk3:/usr/share/games/quake3/baseq3/pak0.pk3" \
-wokoman/quake3-osp-server
+git.michalkozak.cz/wokoman/quake3-osp-server
 ```
 
 ### Customization
@@ -17,7 +19,7 @@ To run one of OSP's own mode configs instead of the default instagib, append `+e
 ```shell
 docker run --name q3aospserver -d -p 27960:27960/udp \
 -v "$HOME/.local/share/Steam/steamapps/common/Quake 3 Arena/baseq3/pak0.pk3:/usr/share/games/quake3/baseq3/pak0.pk3" \
-wokoman/quake3-osp-server +exec freezetag.cfg
+git.michalkozak.cz/wokoman/quake3-osp-server +exec freezetag.cfg
 ```
 
 Other included modes: `ffa.cfg`, `ctf.cfg`, `1v1.cfg`, `team.cfg`, `clanarena.cfg`, `instagib.cfg`, `lanwarig.cfg`, `lanwarctf.cfg`.
@@ -28,7 +30,7 @@ Or bring your own server config — mount it and exec it:
 docker run --name q3aospserver -d -p 27960:27960/udp \
 -v "$HOME/.local/share/Steam/steamapps/common/Quake 3 Arena/baseq3/pak0.pk3:/usr/share/games/quake3/baseq3/pak0.pk3" \
 -v /path/to/server.cfg:/usr/share/games/quake3/osp/server.cfg \
-wokoman/quake3-osp-server +exec server.cfg
+git.michalkozak.cz/wokoman/quake3-osp-server +exec server.cfg
 ```
 
 There's also an example `docker-compose.yml` in the repo which you can freely customize.
@@ -39,11 +41,21 @@ The default config (`lanwarig.cfg`) starts arena with fraglimit 30 on q3dm17 wit
 ⚠️ **The default rcon password is `kolikchcesparku` and it is published right here — change it before exposing the server to the internet.** Set your own in your `server.cfg`, or within game with `;rcon seta rconpassword "<secretpassword>"`.
 
 ### Building and releasing
-Build and publish with your own tag, keeping `latest` plus a `yymmdd` build date:
+Publish to the Forgejo registry (canonical), keeping `latest` plus a `yymmdd` build date:
 
 ```shell
-docker build -t wokoman/quake3-osp-server:latest .
-docker tag wokoman/quake3-osp-server:latest wokoman/quake3-osp-server:$(date +%y%m%d)
+docker login git.michalkozak.cz
+docker build -t git.michalkozak.cz/wokoman/quake3-osp-server:latest .
+docker tag git.michalkozak.cz/wokoman/quake3-osp-server:latest git.michalkozak.cz/wokoman/quake3-osp-server:$(date +%y%m%d)
+docker push git.michalkozak.cz/wokoman/quake3-osp-server:latest
+docker push git.michalkozak.cz/wokoman/quake3-osp-server:$(date +%y%m%d)
+```
+
+Then mirror the same image to Docker Hub:
+
+```shell
+docker tag git.michalkozak.cz/wokoman/quake3-osp-server:latest wokoman/quake3-osp-server:latest
+docker tag git.michalkozak.cz/wokoman/quake3-osp-server:latest wokoman/quake3-osp-server:$(date +%y%m%d)
 docker push wokoman/quake3-osp-server:latest
 docker push wokoman/quake3-osp-server:$(date +%y%m%d)
 ```

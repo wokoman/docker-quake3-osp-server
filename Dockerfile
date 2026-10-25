@@ -26,6 +26,9 @@ COPY --from=game-data /data/baseq3 /usr/share/games/quake3/baseq3
 COPY --from=game-data /data/osp /usr/share/games/quake3/osp
 COPY --chmod=0755 healthcheck.sh /usr/local/bin/healthcheck.sh
 
+# Forgejo auto-links the package to this repo via this label.
+LABEL org.opencontainers.image.source="https://git.michalkozak.cz/wokoman/docker-quake3-osp-server"
+
 USER q3server
 WORKDIR /usr/share/games/quake3
 

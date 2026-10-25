@@ -3,40 +3,58 @@
 Running this image starts **Quake 3 Arena** server with OSP and instagib on. Using full **OSP 1.03a**.
 
 ### Requirements
-This image is fully functional, you only need to supply your own `pak0.pk3` file.
-
-Running the image is then simple as:
+This image is fully functional, you only need to supply your own `pak0.pk3` file. If you own the game on Steam, it lives in `steamapps/common/Quake 3 Arena/baseq3/pak0.pk3`. If yours lives elsewhere (e.g. a CD install), adjust the mount path below.
 
 ```shell
 docker run --name q3aospserver -d -p 27960:27960/udp \
--v /path/to/pak0.pk3:/usr/share/games/quake3/baseq3/pak0.pk3 \
+-v "$HOME/.local/share/Steam/steamapps/common/Quake 3 Arena/baseq3/pak0.pk3:/usr/share/games/quake3/baseq3/pak0.pk3" \
 wokoman/quake3-osp-server
 ```
 
 ### Customization
-If you want to run the server with OSP, but with your own settings, you can either feed the commands through Docker CLI as in:
+To run one of OSP's own mode configs instead of the default instagib, append `+exec`, e.g. freezetag:
 
 ```shell
 docker run --name q3aospserver -d -p 27960:27960/udp \
--v /path/to/pak0.pk3:/usr/share/games/quake3/baseq3/pak0.pk3 \
-wokoman/quake3-osp-server +fraglimit 150
+-v "$HOME/.local/share/Steam/steamapps/common/Quake 3 Arena/baseq3/pak0.pk3:/usr/share/games/quake3/baseq3/pak0.pk3" \
+wokoman/quake3-osp-server +exec freezetag.cfg
 ```
 
-Or entire server config:
+Other included modes: `ffa.cfg`, `ctf.cfg`, `1v1.cfg`, `team.cfg`, `clanarena.cfg`, `instagib.cfg`, `lanwarig.cfg`, `lanwarctf.cfg`.
+
+Or bring your own server config — mount it and exec it:
 
 ```shell
 docker run --name q3aospserver -d -p 27960:27960/udp \
--v /path/to/pak0.pk3:/usr/share/games/quake3/baseq3/pak0.pk3 \
+-v "$HOME/.local/share/Steam/steamapps/common/Quake 3 Arena/baseq3/pak0.pk3:/usr/share/games/quake3/baseq3/pak0.pk3" \
 -v /path/to/server.cfg:/usr/share/games/quake3/osp/server.cfg \
-wokoman/quake3-osp-server
+wokoman/quake3-osp-server +exec server.cfg
 ```
 
-Or even better, there's a example of `docker-compose.yml` file in the repo, which you can freely customize. Simply amend `command` line to your liking, or supply your own `server.cfg` altogether.
+There's also an example `docker-compose.yml` in the repo which you can freely customize.
 
 ### Defaults
-Rcon password is set to `kolikchcesparku`. You can set your own within game with `;rcon seta rconpassword "<secretpassword>"`.
+The default config (`lanwarig.cfg`) starts arena with fraglimit 30 on q3dm17 with instagib on.
 
-Default config starts arena with fraglimit 30 on q3dm17 with instagib on. You're free to use any included OSP gamemode by `;rcon exec <config>.cfg`.
+⚠️ **The default rcon password is `kolikchcesparku` and it is published right here — change it before exposing the server to the internet.** Set your own in your `server.cfg`, or within game with `;rcon seta rconpassword "<secretpassword>"`.
+
+### Building and releasing
+Build and publish with your own tag, keeping `latest` plus a `yymmdd` build date:
+
+```shell
+docker build -t wokoman/quake3-osp-server:latest .
+docker tag wokoman/quake3-osp-server:latest wokoman/quake3-osp-server:$(date +%y%m%d)
+docker push wokoman/quake3-osp-server:latest
+docker push wokoman/quake3-osp-server:$(date +%y%m%d)
+```
+
+Before releasing, run the smoke test — it builds the image, boots it against a real `pak0.pk3` and asserts over the game's UDP status query that OSP is served. It defaults to the Steam install location; pass a path to use another `pak0.pk3`:
+
+```shell
+./smoke_test.py
+```
+
+Note for podman users: podman's default OCI image build drops `HEALTHCHECK` metadata; build with `--format docker` to keep it. Images built and released with docker carry it.
 
 ### Troubleshooting
 The server logs, so you can simply:

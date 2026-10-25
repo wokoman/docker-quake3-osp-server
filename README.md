@@ -54,7 +54,7 @@ Before releasing, run the smoke test — it builds the image, boots it against a
 ./smoke_test.py
 ```
 
-Note for podman users: podman's default OCI image build drops `HEALTHCHECK` metadata; build with `--format docker` to keep it. Images built and released with docker carry it.
+Note for podman users: podman's default OCI image build drops `HEALTHCHECK` metadata; build with `--format docker` to keep it. Images built and released with docker carry it. On SELinux hosts (e.g. Fedora), append `:Z` to the bind mounts — otherwise the engine cannot read `pak0.pk3`.
 
 ### Troubleshooting
 The server logs, so you can simply:

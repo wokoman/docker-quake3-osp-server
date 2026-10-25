@@ -75,6 +75,8 @@ The server logs, so you can simply:
 docker logs q3aospserver
 ```
 
+If the client hangs forever at "connecting" with no error, you probably used `connect localhost`: `localhost` can resolve to IPv6 `::1`, which rootless container runtimes don't forward into the container — the packets vanish silently. Use `connect 127.0.0.1` or the host's LAN IP instead.
+
 ### Shoutouts
 I forked this image from [InAmiTe](https://github.com/InAnimaTe/docker-quake3) who took [jberrenberg](https://hub.docker.com/r/jberrenberg/quake3) image in the first place. Shoutout!
 

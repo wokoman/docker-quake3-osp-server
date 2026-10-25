@@ -2,7 +2,7 @@
 
 ![OSP](https://img.shields.io/badge/OSP-1.03a-e05d44) ![engine](https://img.shields.io/badge/engine-ioquake3%201.36-2ea44f) ![registry](https://img.shields.io/badge/registry-Forgejo%C2%A0%C2%B7%C2%A0Docker%20Hub-0b7285)
 
-Stand up a **Quake 3 Arena** dedicated server with the full **OSP 1.03a** mod in one command — built for LAN parties. Your crew's instagib config boots by default; the only thing you supply is your own `pak0.pk3`.
+Stand up a **Quake 3 Arena** dedicated server with the full **OSP 1.03a** mod in one command — built for LAN parties. A customized OSP instagib config (`lanwarig.cfg`) boots by default; the only thing you supply is your own `pak0.pk3`.
 
 ## 📦 What's in the image
 
@@ -68,7 +68,7 @@ git.michalkozak.cz/wokoman/quake3-osp-server +exec freezetag.cfg
 
 | Config | Mode |
 | --- | --- |
-| `lanwarig.cfg` | Instagib arena — the default, your crew's party config |
+| `lanwarig.cfg` | Instagib arena — the default config |
 | `instagib.cfg` | Instagib |
 | `ffa.cfg` | Free for all |
 | `ctf.cfg` | Capture the flag |
@@ -112,6 +112,8 @@ docker tag git.michalkozak.cz/wokoman/quake3-osp-server:latest git.michalkozak.c
 docker push git.michalkozak.cz/wokoman/quake3-osp-server:latest
 docker push git.michalkozak.cz/wokoman/quake3-osp-server:$(date +%y%m%d)
 ```
+
+The login needs an access token with `write:package` — a scoped token without it authenticates fine but fails the push with "authentication required".
 
 Then mirror the same image to Docker Hub:
 

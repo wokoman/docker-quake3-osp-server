@@ -21,15 +21,15 @@ One file: your own `pak0.pk3` (i.e. you own the game).
 | Steam, Windows | `C:\Program Files (x86)\Steam\steamapps\common\Quake 3 Arena\baseq3\pak0.pk3` |
 | CD install | `quake3/baseq3/pak0.pk3` |
 
-`docker` or `podman` — the commands below use `docker`; for `podman`, just swap the name. The image lives canonically in this repo's [Forgejo registry](https://git.michalkozak.cz/wokoman/docker-quake3-osp-server) and is mirrored to Docker Hub as `wokoman/quake3-osp-server` (public, pulls without a login).
+`docker` or `podman` — the commands below use `docker`; for `podman`, just swap the name. The image lives canonically in this repo's [Forgejo registry](https://git.michalkozak.cz/wokoman/docker-quake3-osp-server) and is mirrored to Docker Hub as `wokoman/quake3-osp-server`. Both pull anonymously; a login is only needed to push.
 
 ## 🏁 Quickstart
 
-**1 · Pull** the image (or use the anonymous Docker Hub mirror if you have no Forgejo login):
+**1 · Pull** the image — both registries serve anonymous pulls:
 
 ```shell
 docker pull git.michalkozak.cz/wokoman/quake3-osp-server
-# anonymous mirror: docker pull wokoman/quake3-osp-server
+# fallback mirror: docker pull wokoman/quake3-osp-server
 ```
 
 **2 · Run** the server, pointing the mount at your `pak0.pk3`:

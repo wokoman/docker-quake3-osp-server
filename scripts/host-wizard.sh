@@ -233,7 +233,7 @@ if ! "$ENGINE" pull "$IMAGE"; then
   if ! "$ENGINE" pull "$IMAGE"; then
     warn "couldn't pull from either registry"
     open_url "https://git.michalkozak.cz/wokoman/docker-quake3-osp-server"
-    step "See the README's maintainer notes on build & release (Forgejo pulls may need a login), then re-run."
+    step "Not published yet or registry unreachable? Use the mirror above. Pushing needs a login — see the README's maintainer notes."
     exit 1
   fi
 fi

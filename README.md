@@ -1,3 +1,6 @@
+> **Archived.** The maintained upstream is [git.michalkozak.cz/wokoman/docker-quake3-osp-server](https://git.michalkozak.cz/wokoman/docker-quake3-osp-server);
+> images are published to its container registry and mirrored to Docker Hub.
+
 # 🚀 Quake 3 Arena — OSP server in Docker
 
 ![OSP](https://img.shields.io/badge/OSP-1.03a-e05d44) ![engine](https://img.shields.io/badge/engine-ioquake3%201.36-2ea44f) ![registry](https://img.shields.io/badge/registry-Forgejo%C2%A0%C2%B7%C2%A0Docker%20Hub-0b7285)

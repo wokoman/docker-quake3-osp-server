@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Smoke test: build the image, boot it with a real pak0.pk3, assert it serves OSP.
+"""Smoke test: build the image, boot it with a real pak0.pk3, assert it serves OSP
+with the default lanwarig.cfg config.
 
 Usage: ./smoke_test.py [path/to/pak0.pk3]
 """
@@ -56,6 +57,7 @@ def main() -> None:
         assert "statusResponse" in reply, f"unexpected reply: {reply!r}"
         assert "mapname" in reply, f"no map loaded: {reply!r}"
         assert "\\gamename\\osp" in reply, f"OSP mod not reported: {reply!r}"
+        assert "\\sv_hostname\\Lenver InstagibF" in reply, f"default config lanwarig.cfg not active: {reply!r}"
         subprocess.run([runtime, "exec", CONTAINER, "/usr/local/bin/healthcheck.sh"], check=True)
         print(f"smoke OK: server answers getstatus with OSP ({reply.splitlines()[1][:120]}...)")
     except (SystemExit, AssertionError, subprocess.CalledProcessError):

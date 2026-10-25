@@ -1,9 +1,11 @@
 quake3:
-    image: wokoman/quake3-osp-server
+    image: git.michalkozak.cz/wokoman/quake3-osp-server
     container_name: q3aospserver
     restart: always
-#   This will run non-default server arguments, e.g. freezetag, instead of default instagib.
-#   command: +set dedicated 1 +set fs_game osp +exec freezetag.cfg
+#   This will run a non-default OSP mode config, e.g. freezetag, instead of the default instagib.
+#   command: +exec freezetag.cfg
+#   To use your own server.cfg from the volume below, exec it instead.
+#   command: +exec server.cfg
     ports:
         - "27960:27960/udp"
     volumes:

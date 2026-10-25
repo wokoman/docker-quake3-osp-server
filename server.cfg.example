@@ -1,3 +1,4 @@
+// Mount at /usr/share/games/quake3/osp/server.cfg and run the container with: +exec server.cfg
 seta sv_hostname "Instagib server"
 seta sv_maxclients 24
 seta g_motd "Welcome to the official QuakeLAN Server."
